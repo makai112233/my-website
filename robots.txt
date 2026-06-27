@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://makai112233.github.io/my-website/sitemap.xml

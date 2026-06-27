@@ -1,0 +1,1382 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI账号体检表</title>
+  <style>
+    :root {
+      --bg: #f6f7f4;
+      --panel: #ffffff;
+      --panel-soft: #f9faf7;
+      --ink: #17201b;
+      --muted: #667069;
+      --line: #dce2dc;
+      --green: #176b4d;
+      --green-soft: #e6f3ee;
+      --blue: #285a8f;
+      --blue-soft: #e8f0f8;
+      --amber: #a96514;
+      --amber-soft: #fff2df;
+      --red: #a33a33;
+      --red-soft: #fae9e7;
+      --shadow: 0 14px 35px rgba(23, 32, 27, 0.08);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      background: #192720;
+      color: #eef5ef;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+    }
+
+    .brand {
+      display: grid;
+      gap: 6px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.18;
+      font-weight: 750;
+    }
+
+    .brand p {
+      margin: 0;
+      color: #bccbc2;
+      font-size: 13px;
+    }
+
+    .side-block {
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      padding-top: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .side-title {
+      margin: 0;
+      font-size: 13px;
+      color: #aebeb5;
+      font-weight: 700;
+    }
+
+    .lead-list {
+      display: grid;
+      gap: 8px;
+      max-height: 44vh;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .lead-item {
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: var(--radius);
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .lead-item:hover {
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .lead-item strong {
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lead-item span {
+      color: #b9c7bf;
+      font-size: 12px;
+    }
+
+    .main {
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .toolbar h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 760;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(360px, 0.92fr) minmax(420px, 1.08fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 740;
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    form {
+      display: grid;
+      gap: 18px;
+    }
+
+    .section {
+      display: grid;
+      gap: 12px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-size: 13px;
+      color: var(--green);
+      font-weight: 760;
+    }
+
+    .step-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+      color: #2a332d;
+      font-size: 13px;
+      font-weight: 680;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #cfd8d1;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+      padding: 10px 11px;
+      min-height: 42px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 86px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(23, 107, 77, 0.14);
+    }
+
+    .checks {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .check {
+      border: 1px solid #d5ddd6;
+      border-radius: 6px;
+      padding: 9px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #2b342e;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 620;
+      min-width: 0;
+    }
+
+    .check input {
+      width: 16px;
+      height: 16px;
+      min-height: 16px;
+      accent-color: var(--green);
+      flex: 0 0 auto;
+    }
+
+    .button {
+      border: 1px solid transparent;
+      border-radius: 6px;
+      min-height: 40px;
+      padding: 9px 13px;
+      color: var(--ink);
+      background: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      font-weight: 720;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      border-color: #b9c6bd;
+    }
+
+    .button:active {
+      transform: translateY(0);
+    }
+
+    .button.primary {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .button.primary:hover {
+      border-color: var(--green);
+      background: #125d42;
+    }
+
+    .button.secondary {
+      background: var(--blue-soft);
+      color: var(--blue);
+      border-color: #c9d9ea;
+    }
+
+    .button.ghost {
+      background: transparent;
+      color: #dce8df;
+      border-color: rgba(255, 255, 255, 0.2);
+      width: 100%;
+    }
+
+    .button.warn {
+      background: var(--amber-soft);
+      color: var(--amber);
+      border-color: #f0d3aa;
+    }
+
+    .form-actions {
+      display: grid;
+      grid-template-columns: 1fr 120px;
+      gap: 10px;
+      position: sticky;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      padding-top: 4px;
+    }
+
+    .report {
+      display: grid;
+      gap: 14px;
+    }
+
+    .empty {
+      min-height: 360px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+      padding: 28px;
+    }
+
+    .score-row {
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+    }
+
+    .score-ring {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--green) var(--score), #e5ebe5 0);
+      position: relative;
+      margin: auto;
+    }
+
+    .score-ring::after {
+      content: "";
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+    }
+
+    .score-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      text-align: center;
+    }
+
+    .score-inner strong {
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 820;
+    }
+
+    .score-inner span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .verdict {
+      display: grid;
+      gap: 8px;
+    }
+
+    .verdict h4 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .verdict p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 760;
+    }
+
+    .tag.blue {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .tag.amber {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .tag.red {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      display: grid;
+      gap: 7px;
+      background: #fff;
+      min-width: 0;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .bar {
+      height: 7px;
+      background: #e7ece7;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: var(--w);
+      background: var(--green);
+    }
+
+    .metric strong {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .report-section {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .report-section h4 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .report-section p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .item-list {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .item-list li {
+      padding-left: 2px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mini-card {
+      border: 1px solid #dce2dc;
+      border-radius: 6px;
+      padding: 10px;
+      background: var(--panel-soft);
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .mini-card strong {
+      font-size: 13px;
+    }
+
+    .mini-card span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 18px;
+      background: #16241d;
+      color: #fff;
+      padding: 10px 13px;
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 30;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1180px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        min-height: auto;
+      }
+
+      .lead-list {
+        max-height: 180px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .main {
+        padding: 14px;
+      }
+
+      .toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toolbar-actions {
+        width: 100%;
+        justify-content: stretch;
+      }
+
+      .toolbar-actions .button {
+        flex: 1 1 140px;
+      }
+
+      .grid-2,
+      .grid-3,
+      .checks,
+      .two-col,
+      .metric-grid,
+      .score-row {
+        grid-template-columns: 1fr;
+      }
+
+      .form-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-body {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>AI账号体检表</h1>
+        <p>同城获客 · 老板IP · 内容转化</p>
+      </div>
+
+      <div class="side-block">
+        <p class="side-title">最近体检</p>
+        <div id="leadList" class="lead-list"></div>
+      </div>
+
+      <div class="side-block">
+        <button id="clearLeads" class="button ghost" type="button">清空本地记录</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="toolbar">
+        <h2>账号诊断工作台</h2>
+        <div class="toolbar-actions">
+          <button id="copyReport" class="button secondary" type="button">复制报告</button>
+          <button id="downloadReport" class="button secondary" type="button">下载报告</button>
+          <button id="copyPrompt" class="button warn" type="button">复制深度提示词</button>
+        </div>
+      </div>
+
+      <div class="layout">
+        <section class="panel">
+          <div class="panel-header">
+            <h3>客户与账号信息</h3>
+            <span class="tag blue">MVP</span>
+          </div>
+          <div class="panel-body">
+            <form id="checkupForm">
+              <div class="section">
+                <p class="section-title"><span class="step-dot">1</span>基础信息</p>
+                <div class="grid-2">
+                  <label>客户称呼
+                    <input name="clientName" placeholder="例如：王总">
+                  </label>
+                  <label>联系方式
+                    <input name="contact" placeholder="微信 / 手机">
+                  </label>
+                </div>
+                <div class="grid-3">
+                  <label>城市
+                    <input name="city" value="济南">
+                  </label>
+                  <label>行业
+                    <select name="industry">
+                      <option>装修</option>
+                      <option>房产</option>
+                      <option>汽车</option>
+                      <option>口腔/医美</option>
+                      <option>家居建材</option>
+                      <option>工厂/B2B</option>
+                      <option>教培</option>
+                      <option>餐饮</option>
+                      <option>其他</option>
+                    </select>
+                  </label>
+                  <label>客单价
+                    <select name="ticket">
+                      <option>3000以下</option>
+                      <option>3000-10000</option>
+                      <option>10000-50000</option>
+                      <option>50000以上</option>
+                    </select>
+                  </label>
+                </div>
+                <label>产品 / 服务
+                  <input name="product" placeholder="例如：旧房改造、二手车、全屋定制">
+                </label>
+                <label>目标客户
+                  <input name="customer" placeholder="例如：济南准备装修的改善型家庭">
+                </label>
+              </div>
+
+              <div class="section">
+                <p class="section-title"><span class="step-dot">2</span>账号现状</p>
+                <label>账号链接
+                  <input name="accountLink" placeholder="抖音 / 视频号 / 小红书链接">
+                </label>
+                <div class="grid-2">
+                  <label>账号类型
+                    <select name="accountType">
+                      <option>未确定</option>
+                      <option>老板IP</option>
+                      <option>门店IP</option>
+                      <option>员工IP</option>
+                      <option>剧情获客号</option>
+                      <option>直播获客号</option>
+                      <option>矩阵账号</option>
+                    </select>
+                  </label>
+                  <label>转化目标
+                    <select name="conversionGoal">
+                      <option>加微信咨询</option>
+                      <option>到店预约</option>
+                      <option>直播成交</option>
+                      <option>私信留资</option>
+                      <option>品牌信任</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="grid-3">
+                  <label>粉丝数
+                    <input name="followers" type="number" min="0" placeholder="例如：1200">
+                  </label>
+                  <label>平均播放
+                    <input name="avgViews" type="number" min="0" placeholder="例如：800">
+                  </label>
+                  <label>最高播放
+                    <input name="bestViews" type="number" min="0" placeholder="例如：12000">
+                  </label>
+                </div>
+                <div class="grid-3">
+                  <label>更新频率
+                    <select name="publishFreq">
+                      <option>不稳定</option>
+                      <option>每周1-2条</option>
+                      <option>每周3-5条</option>
+                      <option>每天1条以上</option>
+                    </select>
+                  </label>
+                  <label>能否真人出镜
+                    <select name="canAppear">
+                      <option>可以稳定出镜</option>
+                      <option>偶尔可以</option>
+                      <option>不愿意出镜</option>
+                    </select>
+                  </label>
+                  <label>月预算
+                    <select name="budget">
+                      <option>3000以下</option>
+                      <option>3000-10000</option>
+                      <option>10000-30000</option>
+                      <option>30000以上</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div class="section">
+                <p class="section-title"><span class="step-dot">3</span>转化与团队</p>
+                <div class="grid-3">
+                  <label>直播承接
+                    <select name="hasLive">
+                      <option>没有直播</option>
+                      <option>偶尔直播</option>
+                      <option>稳定直播</option>
+                    </select>
+                  </label>
+                  <label>私域承接
+                    <select name="hasPrivate">
+                      <option>没有私域</option>
+                      <option>有微信但不系统</option>
+                      <option>有社群/销售跟进</option>
+                    </select>
+                  </label>
+                  <label>执行团队
+                    <select name="team">
+                      <option>老板自己做</option>
+                      <option>有拍剪人员</option>
+                      <option>有运营和销售</option>
+                    </select>
+                  </label>
+                </div>
+                <label>账号简介 / 主页文案
+                  <textarea name="bio" placeholder="复制当前主页简介，或写你想表达的定位"></textarea>
+                </label>
+                <label>近期内容方向
+                  <textarea name="recentTopics" placeholder="写最近发的5-10条内容主题"></textarea>
+                </label>
+                <label>主要竞品 / 对标账号
+                  <textarea name="competitors" placeholder="账号名、链接或你认可的同行"></textarea>
+                </label>
+              </div>
+
+              <div class="section">
+                <p class="section-title"><span class="step-dot">4</span>当前问题</p>
+                <div class="checks">
+                  <label class="check"><input type="checkbox" name="pain" value="播放低">播放低</label>
+                  <label class="check"><input type="checkbox" name="pain" value="有播放无咨询">有播放无咨询</label>
+                  <label class="check"><input type="checkbox" name="pain" value="不知道拍什么">不知道拍什么</label>
+                  <label class="check"><input type="checkbox" name="pain" value="老板不会表达">老板不会表达</label>
+                  <label class="check"><input type="checkbox" name="pain" value="内容像广告">内容像广告</label>
+                  <label class="check"><input type="checkbox" name="pain" value="没有私域承接">没有私域承接</label>
+                  <label class="check"><input type="checkbox" name="pain" value="团队执行不稳定">团队执行不稳定</label>
+                  <label class="check"><input type="checkbox" name="pain" value="不知道怎么成交">不知道怎么成交</label>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button class="button primary" type="submit">生成体检报告</button>
+                <button id="resetForm" class="button" type="button">重置</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>体检报告</h3>
+            <span id="reportStatus" class="tag amber">未生成</span>
+          </div>
+          <div class="panel-body">
+            <div id="report" class="report">
+              <div class="empty">
+                <div>
+                  <strong>报告将在这里生成</strong>
+                  <p>分数、问题、选题、钩子和成交路径会同步整理。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const form = document.getElementById("checkupForm");
+    const reportEl = document.getElementById("report");
+    const reportStatus = document.getElementById("reportStatus");
+    const leadList = document.getElementById("leadList");
+    const toast = document.getElementById("toast");
+
+    let currentReport = null;
+
+    const industryData = {
+      "装修": {
+        role: "装修避坑顾问",
+        angles: ["报价避坑", "工地真实案例", "家庭决策冲突", "旧房改造过程"],
+        hooks: [
+          "装修最容易多花钱的，不是材料，而是报价单里这3个地方",
+          "客户说预算15万，最后差点花到27万，问题出在哪",
+          "婆婆坚持一种风格，儿媳坚持另一种，设计师该怎么调和",
+          "济南装修老板别先拍工地，先拍客户为什么不敢相信你"
+        ],
+        proof: ["真实工地", "报价对比", "完工前后", "客户避坑故事"]
+      },
+      "房产": {
+        role: "本地买房参谋",
+        angles: ["买房避坑", "楼盘测评", "预算选择", "家庭买房冲突"],
+        hooks: [
+          "同样的预算，为什么有的人买完升值，有的人买完后悔",
+          "这类房子看着便宜，但普通家庭买之前一定要想清楚",
+          "房产顾问天天发楼盘广告，为什么客户反而不咨询",
+          "买房不是先看房，是先把家庭需求排清楚"
+        ],
+        proof: ["板块对比", "成交案例", "客户需求分析", "踩盘记录"]
+      },
+      "汽车": {
+        role: "买车避坑顾问",
+        angles: ["车型对比", "二手车避坑", "提车故事", "价格内幕"],
+        hooks: [
+          "客户贪便宜买车，开回家第三天就后悔了",
+          "买车不要只问优惠，先看这几个隐藏成本",
+          "汽车销售最该拍的不是车，而是客户买车前的顾虑",
+          "预算10万到15万，到底该怎么选车"
+        ],
+        proof: ["客户提车", "售后案例", "价格拆解", "试驾体验"]
+      },
+      "口腔/医美": {
+        role: "专业信任顾问",
+        angles: ["方案科普", "风险提醒", "真实案例", "医生IP"],
+        hooks: [
+          "别一上来就问多少钱，先判断你到底适不适合做",
+          "同样一个项目，为什么有人效果好，有人踩坑",
+          "医生账号不要只拍环境，客户真正担心的是这3件事",
+          "第一次咨询口腔/医美，先问清楚这几个问题"
+        ],
+        proof: ["专业资质", "案例前后", "流程透明", "风险说明"]
+      },
+      "家居建材": {
+        role: "家庭采购参谋",
+        angles: ["材料避坑", "家庭决策", "安装过程", "真实对比"],
+        hooks: [
+          "家里买建材最怕的不是贵，而是买错了还不知道",
+          "为什么同样的产品，有人用十年，有人一年就后悔",
+          "家居建材老板别只拍产品参数，客户看不懂也不信",
+          "夫妻选建材意见不一致，真正要解决的是这个问题"
+        ],
+        proof: ["安装现场", "材料对比", "客户家案例", "售后说明"]
+      },
+      "工厂/B2B": {
+        role: "靠谱工厂主理人",
+        angles: ["工厂实力", "生产过程", "交付稳定", "老板故事"],
+        hooks: [
+          "很多工厂不是没实力，是在线上没有被客户看见",
+          "客户没来过厂之前，怎么先相信你",
+          "工厂老板不要只拍机器，客户更想看你靠不靠谱",
+          "一个订单能不能长期合作，先看工厂这几个细节"
+        ],
+        proof: ["生产线", "质检流程", "客户复购", "交付记录"]
+      },
+      "教培": {
+        role: "学习规划顾问",
+        angles: ["家长痛点", "学习案例", "规划方法", "课堂记录"],
+        hooks: [
+          "孩子成绩上不去，很多家长第一步就做错了",
+          "报课之前，先判断孩子到底缺什么",
+          "教培账号不能只拍课堂，家长关心的是结果和安全感",
+          "一个学生的变化，通常不是从多上课开始的"
+        ],
+        proof: ["学习变化", "课堂片段", "规划表", "家长反馈"]
+      },
+      "餐饮": {
+        role: "本地餐饮主理人",
+        angles: ["招牌菜", "老板真实感", "门店场景", "顾客体验"],
+        hooks: [
+          "餐饮店别只拍菜，先让附近的人记住你是谁",
+          "为什么有的店视频拍得一般，却一直有人来",
+          "本地餐饮想获客，最该拍的是顾客为什么复购",
+          "一条视频让客户想来店里，开头要先讲这个"
+        ],
+        proof: ["顾客评价", "后厨透明", "招牌菜过程", "回头客故事"]
+      },
+      "其他": {
+        role: "行业信任顾问",
+        angles: ["客户痛点", "真实案例", "避坑知识", "老板IP"],
+        hooks: [
+          "客户不找你，不是产品差，是账号没把信任讲出来",
+          "你的账号不是缺视频，而是缺客户愿意咨询的理由",
+          "别先介绍自己，先讲客户正在遇到的问题",
+          "想让客户主动问你，先把这3件事拍清楚"
+        ],
+        proof: ["真实案例", "客户反馈", "服务过程", "专业判断"]
+      }
+    };
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function formData() {
+      const data = Object.fromEntries(new FormData(form).entries());
+      data.pain = Array.from(form.querySelectorAll("input[name='pain']:checked")).map(item => item.value);
+      return data;
+    }
+
+    function num(value) {
+      const n = Number(value || 0);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function hasText(value, min = 4) {
+      return String(value || "").trim().length >= min;
+    }
+
+    function scoreReport(data) {
+      const followers = num(data.followers);
+      const avgViews = num(data.avgViews);
+      const bestViews = num(data.bestViews);
+
+      let positioning = 0;
+      if (hasText(data.city, 2)) positioning += 3;
+      if (data.industry) positioning += 3;
+      if (data.accountType && data.accountType !== "未确定") positioning += 5;
+      if (hasText(data.product)) positioning += 4;
+      if (hasText(data.customer)) positioning += 4;
+      if (data.conversionGoal) positioning += 4;
+      positioning = clamp(positioning, 0, 20);
+
+      let content = 0;
+      const viewRatio = followers > 0 ? avgViews / followers : avgViews > 0 ? 0.8 : 0;
+      content += clamp(viewRatio * 8, 0, 8);
+      content += bestViews > avgViews * 5 && bestViews > 0 ? 5 : bestViews > avgViews * 2 && bestViews > 0 ? 3 : 0;
+      content += data.publishFreq === "每天1条以上" ? 6 : data.publishFreq === "每周3-5条" ? 5 : data.publishFreq === "每周1-2条" ? 3 : 0;
+      content += hasText(data.recentTopics, 18) ? 6 : hasText(data.recentTopics, 6) ? 3 : 0;
+      content = clamp(Math.round(content), 0, 25);
+
+      let trust = 0;
+      trust += data.canAppear === "可以稳定出镜" ? 6 : data.canAppear === "偶尔可以" ? 3 : 0;
+      trust += hasText(data.bio, 16) ? 5 : hasText(data.bio, 6) ? 2 : 0;
+      trust += hasText(data.competitors, 8) ? 3 : 0;
+      trust += data.team === "有运营和销售" ? 3 : data.team === "有拍剪人员" ? 2 : 0;
+      trust += hasText(data.product) && hasText(data.customer) ? 3 : 0;
+      trust = clamp(trust, 0, 20);
+
+      let conversion = 0;
+      conversion += data.hasPrivate === "有社群/销售跟进" ? 8 : data.hasPrivate === "有微信但不系统" ? 4 : 0;
+      conversion += data.hasLive === "稳定直播" ? 5 : data.hasLive === "偶尔直播" ? 2 : 0;
+      conversion += data.conversionGoal ? 4 : 0;
+      conversion += data.ticket === "50000以上" ? 4 : data.ticket === "10000-50000" ? 3 : data.ticket === "3000-10000" ? 2 : 1;
+      conversion += data.budget === "30000以上" ? 4 : data.budget === "10000-30000" ? 3 : data.budget === "3000-10000" ? 2 : 0;
+      conversion = clamp(conversion, 0, 25);
+
+      let execution = 0;
+      execution += data.publishFreq === "每天1条以上" ? 4 : data.publishFreq === "每周3-5条" ? 3 : data.publishFreq === "每周1-2条" ? 2 : 0;
+      execution += data.team === "有运营和销售" ? 3 : data.team === "有拍剪人员" ? 2 : 0;
+      execution += data.canAppear === "可以稳定出镜" ? 3 : data.canAppear === "偶尔可以" ? 1 : 0;
+      execution = clamp(execution, 0, 10);
+
+      const total = positioning + content + trust + conversion + execution;
+      return { positioning, content, trust, conversion, execution, total };
+    }
+
+    function level(score) {
+      if (score >= 82) return { name: "优质可放大", tag: "green", text: "账号基础较好，重点应放在放大爆款模型和稳定转化承接。" };
+      if (score >= 68) return { name: "具备成交基础", tag: "blue", text: "账号有机会，但定位、内容或承接里至少有一个短板需要优先补齐。" };
+      if (score >= 50) return { name: "需要系统调整", tag: "amber", text: "当前账号还没有形成稳定获客系统，建议先重做定位和内容模型。" };
+      return { name: "先重建基础", tag: "red", text: "账号暂时不适合直接加大投放或大量拍摄，应先确认客户、定位和转化路径。" };
+    }
+
+    function leadGrade(data, score) {
+      let points = 0;
+      if (["装修", "房产", "汽车", "口腔/医美", "家居建材", "工厂/B2B"].includes(data.industry)) points += 2;
+      if (["10000-50000", "50000以上"].includes(data.ticket)) points += 2;
+      if (["10000-30000", "30000以上"].includes(data.budget)) points += 2;
+      if (data.canAppear !== "不愿意出镜") points += 1;
+      if (data.hasPrivate !== "没有私域") points += 1;
+      if (score >= 50) points += 1;
+      if (points >= 7) return "高价值线索";
+      if (points >= 4) return "可培育线索";
+      return "轻诊断线索";
+    }
+
+    function buildIssues(data, scores) {
+      const issues = [];
+      if (scores.positioning < 14) issues.push("账号定位还不够清楚，客户很难快速判断你服务谁、解决什么问题。");
+      if (data.accountType === "未确定") issues.push("账号角色未确定，内容容易在老板IP、门店广告和泛知识之间摇摆。");
+      if (scores.content < 16) issues.push("内容吸引力不足，需要重新设计3秒钩子、冲突场景和真实案例表达。");
+      if (data.pain.includes("有播放无咨询")) issues.push("内容和转化之间断层，视频可能有热闹感，但没有给客户明确咨询理由。");
+      if (data.pain.includes("内容像广告")) issues.push("账号广告味偏重，需要把产品介绍改成客户痛点、避坑和信任证明。");
+      if (scores.trust < 12) issues.push("信任资产不足，主页、出镜、案例、客户反馈和专业背书需要补齐。");
+      if (scores.conversion < 15) issues.push("转化承接偏弱，需要设计评论区、私信、微信、直播和销售跟进链路。");
+      if (data.pain.includes("团队执行不稳定") || scores.execution < 6) issues.push("执行节奏不稳定，建议先做周选题表、拍摄表和复盘表。");
+      if (!issues.length) issues.push("账号基础不错，下一步重点是提炼可复制的爆款栏目和成交闭环。");
+      return issues.slice(0, 6);
+    }
+
+    function buildPriorities(data, scores) {
+      const list = [];
+      if (scores.positioning < 14) list.push({ title: "先定账号定位", body: `把账号收窄成“${data.city || "本地"}${data.industry}${industryData[data.industry].role}”，不要同时讲产品、日常和泛知识。` });
+      if (scores.content < 16) list.push({ title: "重做内容模型", body: "每条视频先解决客户痛点，再给专业判断，最后给一个明确咨询动作。" });
+      if (scores.conversion < 15) list.push({ title: "补转化链路", body: `围绕“${data.conversionGoal || "咨询"}”设计评论关键词、私信话术、微信承接和跟进表。` });
+      if (scores.trust < 12) list.push({ title: "补信任资产", body: "主页、置顶视频、真实案例、出镜表达和客户反馈要统一支撑一个信任主张。" });
+      if (scores.execution < 6) list.push({ title: "固定执行节奏", body: "先按每周10条选题、2次集中拍摄、1次数据复盘来跑，不要临时想内容。" });
+      if (list.length < 3) list.push({ title: "提炼爆款栏目", body: "把高播放或高咨询内容拆成固定栏目，再围绕栏目持续测试开头和场景。" });
+      return list.slice(0, 3);
+    }
+
+    function buildDirections(data) {
+      const preset = industryData[data.industry] || industryData["其他"];
+      const product = data.product || data.industry;
+      const city = data.city || "本地";
+      return preset.angles.map(angle => ({
+        title: `${city}${angle}`,
+        body: `${product}内容不要只讲卖点，要把“客户为什么不敢买、为什么会选错、为什么应该信你”拍出来。`
+      })).slice(0, 4);
+    }
+
+    function buildHooks(data) {
+      const preset = industryData[data.industry] || industryData["其他"];
+      const city = data.city || "本地";
+      const industry = data.industry || "行业";
+      const customer = data.customer || `${city}客户`;
+      const product = data.product || industry;
+      const base = [
+        ...preset.hooks,
+        `${customer}找${product}，最容易忽略的不是价格，而是这件事`,
+        `${city}${industry}老板做短视频，别再把账号拍成朋友圈`,
+        `客户不咨询你，很多时候不是不需要，而是你没把信任讲清楚`,
+        `拍了100条还没客户，先检查这3个地方`,
+        `别一上来就介绍自己，先把客户最怕的坑讲明白`,
+        `如果你是${customer}，做决定前一定要先看这条`
+      ];
+      return Array.from(new Set(base)).slice(0, 10);
+    }
+
+    function buildPath(data, grade) {
+      const city = data.city || "本地";
+      const industry = data.industry || "行业";
+      const goal = data.conversionGoal || "加微信咨询";
+      return [
+        `主页定位改成“${city}${industry}获客/避坑/信任顾问”这类明确表达。`,
+        "置顶3条视频：我是谁、哪些客户适合找我、我怎么帮客户避坑或成交。",
+        "每周固定发布：痛点避坑、真实案例、老板观点、客户问答四类内容。",
+        `评论区设置关键词，引导用户通过“${goal}”进入下一步。`,
+        `把线索记录到表格，按来源视频、需求、微信、跟进状态和成交金额复盘。`,
+        grade === "高价值线索" ? "建议安排一次付费深度诊断，直接进入月度服务或系统搭建报价。" : "建议先用低价诊断报告建立信任，再筛选是否进入深度合作。"
+      ];
+    }
+
+    function buildPrompt(data, report) {
+      return `请你扮演一名懂同城短视频获客、老板IP、私域转化和AI内容系统的顾问，基于以下账号体检信息，输出一份更深入的诊断报告。请包含：账号定位、主要问题、内容栏目、10条选题、3条完整短视频脚本、主页包装建议、私域转化路径、7天执行计划、是否适合进入付费诊断。\\n\\n账号信息：\\n${JSON.stringify(data, null, 2)}\\n\\n初步体检结果：\\n${JSON.stringify(report, null, 2)}`;
+    }
+
+    function buildPlainText(report) {
+      const r = report;
+      return [
+        "AI账号体检报告",
+        `客户：${r.data.clientName || "未填写"}`,
+        `行业：${r.data.city || ""}${r.data.industry || ""}`,
+        `账号链接：${r.data.accountLink || "未填写"}`,
+        `综合分：${r.scores.total}/100`,
+        `诊断等级：${r.level.name}`,
+        `线索判断：${r.grade}`,
+        "",
+        "核心判断：",
+        r.level.text,
+        "",
+        "主要问题：",
+        ...r.issues.map((item, index) => `${index + 1}. ${item}`),
+        "",
+        "优先动作：",
+        ...r.priorities.map((item, index) => `${index + 1}. ${item.title}：${item.body}`),
+        "",
+        "建议内容方向：",
+        ...r.directions.map((item, index) => `${index + 1}. ${item.title}：${item.body}`),
+        "",
+        "10条选题钩子：",
+        ...r.hooks.map((item, index) => `${index + 1}. ${item}`),
+        "",
+        "成交路径：",
+        ...r.path.map((item, index) => `${index + 1}. ${item}`)
+      ].join("\\n");
+    }
+
+    function renderReport(report) {
+      const s = report.scores;
+      const lv = report.level;
+      const scoreStyle = `--score:${s.total * 3.6}deg`;
+      reportEl.innerHTML = `
+        <div class="score-row">
+          <div class="score-ring" style="${scoreStyle}">
+            <div class="score-inner">
+              <strong>${s.total}</strong>
+              <span>综合分</span>
+            </div>
+          </div>
+          <div class="verdict">
+            <div class="tag-row">
+              <span class="tag ${lv.tag}">${lv.name}</span>
+              <span class="tag blue">${report.grade}</span>
+              <span class="tag amber">${report.data.city || "本地"} · ${report.data.industry}</span>
+            </div>
+            <h4>${report.data.clientName || "这个账号"}的当前判断</h4>
+            <p>${lv.text}</p>
+          </div>
+        </div>
+
+        <div class="metric-grid">
+          ${metric("定位", s.positioning, 20)}
+          ${metric("内容", s.content, 25)}
+          ${metric("信任", s.trust, 20)}
+          ${metric("转化", s.conversion, 25)}
+          ${metric("执行", s.execution, 10)}
+        </div>
+
+        <div class="report-section">
+          <h4>主要问题</h4>
+          <ol class="item-list">${report.issues.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ol>
+        </div>
+
+        <div class="report-section">
+          <h4>优先动作</h4>
+          <div class="two-col">${report.priorities.map(item => `
+            <div class="mini-card">
+              <strong>${escapeHtml(item.title)}</strong>
+              <span>${escapeHtml(item.body)}</span>
+            </div>
+          `).join("")}</div>
+        </div>
+
+        <div class="report-section">
+          <h4>建议内容方向</h4>
+          <div class="two-col">${report.directions.map(item => `
+            <div class="mini-card">
+              <strong>${escapeHtml(item.title)}</strong>
+              <span>${escapeHtml(item.body)}</span>
+            </div>
+          `).join("")}</div>
+        </div>
+
+        <div class="report-section">
+          <h4>10条选题钩子</h4>
+          <ol class="item-list">${report.hooks.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ol>
+        </div>
+
+        <div class="report-section">
+          <h4>成交路径</h4>
+          <ol class="item-list">${report.path.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ol>
+        </div>
+      `;
+      reportStatus.textContent = "已生成";
+      reportStatus.className = "tag green";
+    }
+
+    function metric(label, value, max) {
+      const percent = Math.round((value / max) * 100);
+      return `
+        <div class="metric">
+          <span>${label}</span>
+          <strong>${value}/${max}</strong>
+          <div class="bar"><i style="--w:${percent}%"></i></div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function saveLead(report) {
+      const leads = loadLeads();
+      const item = {
+        id: Date.now(),
+        time: new Date().toLocaleString("zh-CN"),
+        data: report.data,
+        score: report.scores.total,
+        grade: report.grade
+      };
+      leads.unshift(item);
+      localStorage.setItem("aiAccountCheckupLeads", JSON.stringify(leads.slice(0, 30)));
+      renderLeads();
+    }
+
+    function loadLeads() {
+      try {
+        return JSON.parse(localStorage.getItem("aiAccountCheckupLeads") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function renderLeads() {
+      const leads = loadLeads();
+      if (!leads.length) {
+        leadList.innerHTML = `<div class="lead-item"><strong>暂无记录</strong><span>生成报告后自动保存</span></div>`;
+        return;
+      }
+      leadList.innerHTML = leads.map(item => `
+        <div class="lead-item" data-id="${item.id}">
+          <strong>${escapeHtml(item.data.clientName || item.data.industry || "未命名客户")} · ${item.score}分</strong>
+          <span>${escapeHtml(item.data.city || "")}${escapeHtml(item.data.industry || "")} / ${escapeHtml(item.grade)} / ${escapeHtml(item.time)}</span>
+        </div>
+      `).join("");
+    }
+
+    function createReport(data) {
+      const scores = scoreReport(data);
+      const lv = level(scores.total);
+      const grade = leadGrade(data, scores.total);
+      return {
+        data,
+        scores,
+        level: lv,
+        grade,
+        issues: buildIssues(data, scores),
+        priorities: buildPriorities(data, scores),
+        directions: buildDirections(data),
+        hooks: buildHooks(data),
+        path: buildPath(data, grade)
+      };
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      const data = formData();
+      currentReport = createReport(data);
+      currentReport.text = buildPlainText(currentReport);
+      currentReport.prompt = buildPrompt(data, currentReport);
+      renderReport(currentReport);
+      saveLead(currentReport);
+      showToast("体检报告已生成");
+    });
+
+    document.getElementById("copyReport").addEventListener("click", async () => {
+      if (!currentReport) return showToast("请先生成报告");
+      await navigator.clipboard.writeText(currentReport.text);
+      showToast("报告已复制");
+    });
+
+    document.getElementById("copyPrompt").addEventListener("click", async () => {
+      if (!currentReport) return showToast("请先生成报告");
+      await navigator.clipboard.writeText(currentReport.prompt);
+      showToast("深度提示词已复制");
+    });
+
+    document.getElementById("downloadReport").addEventListener("click", () => {
+      if (!currentReport) return showToast("请先生成报告");
+      const blob = new Blob([currentReport.text], { type: "text/plain;charset=utf-8" });
+      const link = document.createElement("a");
+      const name = (currentReport.data.clientName || currentReport.data.industry || "账号体检").replace(/[\\\\/:*?"<>|]/g, "");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${name}-AI账号体检报告.txt`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+
+    document.getElementById("resetForm").addEventListener("click", () => {
+      form.reset();
+      form.elements.city.value = "济南";
+      currentReport = null;
+      reportStatus.textContent = "未生成";
+      reportStatus.className = "tag amber";
+      reportEl.innerHTML = `
+        <div class="empty">
+          <div>
+            <strong>报告将在这里生成</strong>
+            <p>分数、问题、选题、钩子和成交路径会同步整理。</p>
+          </div>
+        </div>
+      `;
+    });
+
+    document.getElementById("clearLeads").addEventListener("click", () => {
+      localStorage.removeItem("aiAccountCheckupLeads");
+      renderLeads();
+      showToast("本地记录已清空");
+    });
+
+    renderLeads();
+  </script>
+</body>
+</html>
